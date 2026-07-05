@@ -1,67 +1,73 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Sistema Simples</title>
-    <!-- Tailwind CSS -->
+    <title>EloCriativo | Auth & Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-50 p-4">
 
-    <div class="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 class="text-2xl font-bold mb-6 text-center">Login EloCriativo</h2>
-        
-        <input type="email" id="email" placeholder="Email" class="w-full p-2 mb-4 border rounded">
-        <input type="password" id="senha" placeholder="Senha" class="w-full p-2 mb-4 border rounded">
-        
-        <button onclick="fazerLogin()" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
-            Entrar
+    <div id="auth-section" class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-lg mt-10">
+        <h2 class="text-xl font-bold mb-4">Login EloCriativo</h2>
+        <button id="btn-google" class="w-full bg-red-500 text-white p-3 rounded-lg font-bold hover:bg-red-600">
+            Entrar com Google
         </button>
+    </div>
 
-        <p id="mensagem" class="mt-4 text-center text-sm"></p>
+    <div id="dashboard-section" class="hidden max-w-4xl mx-auto mt-10">
+        <h2 class="text-2xl font-bold mb-4">Ateliês Cadastrados</h2>
+        <div id="users-list" class="grid gap-3"></div>
+        <button onclick="logout()" class="mt-4 bg-gray-500 text-white p-2 rounded">Sair</button>
     </div>
 
     <script>
-        // 1. CONFIGURAÇÃO
         const SUPABASE_URL = "https://cbmyddxxmwhsbemcnrvb.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNibXlkZHh4bXdoc2JlbWNucnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyNjA2MjIsImV4cCI6MjA5ODgzNjYyMn0.CdutNfXlo4cF7C2edIKpYYe1_KvAP3AbHbFfvumBp0M";
-
+        
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // 2. FUNÇÃO DE LOGIN
-        async function fazerLogin() {
-            const email = document.getElementById('email').value;
-            const senha = document.getElementById('senha').value;
-            const msg = document.getElementById('mensagem');
+        // 1. Google Auth
+        document.getElementById('btn-google').addEventListener('click', async () => {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: window.location.origin }
+            });
+            if (error) alert("Erro Google: " + error.message);
+        });
 
-            msg.innerText = "Aguarde...";
-
-            try {
-                const { data, error } = await supabase
-                    .from('lojas')
-                    .select('*')
-                    .eq('email_institucional', email)
-                    .eq('senha_seguranca', senha)
-                    .maybeSingle();
-
-                if (error) throw error;
-
-                if (data) {
-                    msg.className = "mt-4 text-center text-green-600";
-                    msg.innerText = "Sucesso! Logado como: " + data.nome_fantasia;
-                    console.log("Dados do usuário:", data);
-                } else {
-                    msg.className = "mt-4 text-center text-red-600";
-                    msg.innerText = "Email ou senha incorretos.";
-                }
-            } catch (err) {
-                msg.className = "mt-4 text-center text-red-600";
-                msg.innerText = "Erro: " + err.message;
-                console.error(err);
+        // 2. Verificar Estado de Login
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('dashboard-section').classList.remove('hidden');
+                loadUsers();
             }
         }
+
+        // 3. Listar Usuários da Tabela
+        async function loadUsers() {
+            const listDiv = document.getElementById('users-list');
+            const { data, error } = await supabase.from('lojas').select('*');
+            
+            if (error) {
+                listDiv.innerHTML = `<p class="text-red-500">Erro: ${error.message}</p>`;
+                return;
+            }
+            listDiv.innerHTML = data.map(u => `
+                <div class="p-4 bg-white border rounded shadow-sm">
+                    ${u.nome_fantasia} - ${u.email_institucional}
+                </div>
+            `).join('');
+        }
+
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.reload();
+        }
+
+        checkSession();
     </script>
 </body>
 </html>
