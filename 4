@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EloCriativo | CMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .view-container { display: none; }
+        .view-active { display: block; }
+    </style>
+</head>
+<body class="bg-stone-50 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b p-4 flex justify-between items-center">
+        <h1 class="font-bold text-xl">Elo<span class="text-orange-600">Criativo</span></h1>
+        <nav id="nav-menu">
+            <button onclick="showView('view-home')" class="px-4">Home</button>
+            <button onclick="showView('view-login')" class="px-4 text-orange-600">Entrar</button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-6">
+        <section id="view-home" class="view-container view-active">
+            <h2 class="text-3xl font-bold">Vitrine de Ateliês</h2>
+            <div id="shops-list" class="mt-4 grid gap-4">Carregando...</div>
+        </section>
+
+        <section id="view-login" class="view-container">
+            <form onsubmit="handleLogin(event)" class="max-w-sm mx-auto bg-white p-6 rounded shadow">
+                <input type="email" id="email" placeholder="Email" class="w-full border p-2 mb-2" required>
+                <input type="password" id="pass" placeholder="Senha" class="w-full border p-2 mb-2" required>
+                <button class="w-full bg-orange-600 text-white p-2">Acessar Dashboard</button>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        // Inicialização Segura
+        const SUPABASE_URL = "https://cbmyddxxmwhsbemcnrvb.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNibXlkZHh4bXdoc2JlbWNucnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyNjA2MjIsImV4cCI6MjA5ODgzNjYyMn0.CdutNfXlo4cF7C2edIKpYYe1_KvAP3AbHbFfvumBp0M";
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Função de Navegação Robusta
+        function showView(viewId) {
+            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('view-active'));
+            document.getElementById(viewId).classList.add('view-active');
+        }
+
+        // Função de Fetch Corrigida
+        async function fetchShops() {
+            const list = document.getElementById('shops-list');
+            const { data, error } = await supabase.from('lojas').select('*');
+            
+            if (error) {
+                list.innerHTML = "Erro ao conectar ao banco.";
+                return;
+            }
+            
+            list.innerHTML = data.length > 0 
+                ? data.map(l => `<div class="p-4 bg-white border">${l.nome_fantasia}</div>`).join('')
+                : "Nenhum ateliê encontrado.";
+        }
+
+        // Login Handler
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            
+            const { data, error } = await supabase
+                .from('lojas')
+                .select('*')
+                .eq('email_institucional', email)
+                .eq('senha_seguranca', pass)
+                .single();
+
+            if (data) {
+                alert("Login realizado com sucesso!");
+                showView('view-home');
+            } else {
+                alert("Credenciais inválidas.");
+            }
+        }
+
+        // Inicialização após carregamento do DOM
+        document.addEventListener('DOMContentLoaded', fetchShops);
+    </script>
+</body>
+</html>
