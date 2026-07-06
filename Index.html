@@ -2,139 +2,45 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechSocial | Autenticação</title>
-    <style>
-        /* --- ESTILO TECH STORE (Dark Theme) --- */
-        :root {
-            --bg-dark: #0f172a;
-            --card-bg: #1e293b;
-            --accent-cyan: #06b6d4;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-        }
-
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-dark); color: var(--text-main); margin: 0; padding: 0; }
-
-        /* --- TELA DE LOGIN --- */
-        #login-screen { display: flex; justify-content: center; align-items: center; height: 100vh; background: #000; position: fixed; width: 100%; z-index: 1000; }
-        .login-box { background: var(--card-bg); padding: 40px; border-radius: 12px; border: 1px solid var(--accent-cyan); width: 300px; text-align: center; }
-        .login-box input { width: 90%; padding: 10px; margin: 10px 0; background: var(--bg-dark); border: 1px solid #334155; color: white; }
-        .login-box button { width: 100%; padding: 10px; background: var(--accent-cyan); border: none; color: white; font-weight: bold; cursor: pointer; }
-
-        /* --- PAINEL PRINCIPAL --- */
-        #app-screen { display: none; } /* Escondido até logar */
-        .header { background: #020617; padding: 15px 50px; border-bottom: 2px solid var(--accent-cyan); display: flex; justify-content: space-between; align-items: center; }
-        .container { max-width: 1100px; margin: 30px auto; display: grid; grid-template-columns: 280px 1fr; gap: 25px; }
-        
-        .sidebar { background: var(--card-bg); padding: 20px; border-radius: 8px; border-left: 4px solid var(--accent-cyan); }
-        .profile-pic { width: 200px; height: 200px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid var(--accent-cyan); background: #334155; }
-        
-        .content { background: var(--card-bg); padding: 25px; border-radius: 8px; }
-        .tech-card { border: 1px solid #334155; padding: 15px; margin-bottom: 15px; border-radius: 6px; }
-        h2 { color: var(--accent-cyan); margin-top: 0; }
-        
-        /* Inputs modernos */
-        .btn-edit { background: transparent; border: 1px solid var(--accent-cyan); color: var(--accent-cyan); padding: 8px 16px; cursor: pointer; border-radius: 4px; }
-        .btn-edit:hover { background: var(--accent-cyan); color: white; }
-    </style>
+    <title>Minha Loja Social</title>
+    <!-- Tailwind CSS via CDN para estilo rápido -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-900 text-white p-6">
 
-    <div id="login-screen">
-        <div class="login-box">
-            <h2>TechLogin v2.0</h2>
-            <input type="text" id="nick" placeholder="Digite seu Nick...">
-            <input type="password" id="pass" placeholder="Senha (qualquer coisa)...">
-            <button onclick="fazerLogin()">ENTRAR NO SISTEMA</button>
-        </div>
-    </div>
+    <h1 class="text-3xl font-bold mb-6">TECH_STORE_OS</h1>
 
-    <div id="app-screen">
-        <header class="header">
-            <div><strong>TECH_STORE_OS</strong></div>
-            <div id="user-display">Usuário: -</div>
-        </header>
-
-        <div class="container">
-            <aside class="sidebar">
-                <img src="" id="fotoPerfil" class="profile-pic" alt="Foto">
-                <h3 id="display-nick">Nick</h3>
-                <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="salvarFoto(this)">
-                <button class="btn-edit" onclick="document.getElementById('fileInput').click()">Alterar Foto</button>
-                <br><br>
-                <button class="btn-edit" onclick="fazerLogout()">Sair</button>
-            </aside>
-
-            <main class="content">
-                <section class="tech-card">
-                    <h2>Últimas Compras</h2>
-                    <p>Processador Intel i9 - 14th Gen</p>
-                    <p>Placa de Vídeo RTX 4090</p>
-                </section>
-                
-                <section class="tech-card">
-                    <h2>Configuração da Máquina</h2>
-                    <p>RAM: 64GB DDR5</p>
-                    <p>SSD: 4TB NVMe</p>
-                </section>
-            </main>
+    <!-- Vitrine de Produtos -->
+    <div id="vitrine" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Item de Exemplo -->
+        <div class="border p-4 rounded-lg">
+            <h2 class="text-xl font-semibold">Processador Intel i9</h2>
+            <p class="text-gray-400">Alta performance.</p>
+            <a href="https://wa.me/55062993901617?text=Quero comprar o Processador Intel i9" 
+               class="mt-4 block bg-green-600 text-center py-2 rounded">Comprar via WhatsApp</a>
         </div>
     </div>
 
     <script>
-        // --- LÓGICA DE PERSISTÊNCIA ---
+        // Lógica simples: Lista de produtos para simular o banco de dados
+        const produtos = [
+            { nome: "Processador Intel i9", desc: "14th Gen" },
+            { nome: "Placa de Vídeo RTX 4090", desc: "Poderosa" }
+        ];
 
-        // Verificar se já está logado ao carregar a página
-        window.onload = () => {
-            const nickSalvo = localStorage.getItem('usuarioNick');
-            if(nickSalvo) {
-                entrarNoSistema(nickSalvo);
-            }
-        };
-
-        function fazerLogin() {
-            const nick = document.getElementById('nick').value;
-            if(nick.length > 0) {
-                localStorage.setItem('usuarioNick', nick);
-                entrarNoSistema(nick);
-            } else {
-                alert("Digite um nick válido!");
-            }
-        }
-
-        function entrarNoSistema(nick) {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-screen').style.display = 'block';
-            document.getElementById('display-nick').innerText = nick;
-            document.getElementById('user-display').innerText = "Usuário: " + nick;
-            
-            // Carregar foto se existir
-            const fotoSalva = localStorage.getItem('fotoPerfil');
-            if(fotoSalva) {
-                document.getElementById('fotoPerfil').src = fotoSalva;
-            } else {
-                document.getElementById('fotoPerfil').src = "https://via.placeholder.com/200?text=Sem+Foto";
-            }
-        }
-
-        function fazerLogout() {
-            localStorage.removeItem('usuarioNick');
-            localStorage.removeItem('fotoPerfil');
-            location.reload();
-        }
-
-        function salvarFoto(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const dataUrl = e.target.result;
-                    document.getElementById('fotoPerfil').src = dataUrl;
-                    localStorage.setItem('fotoPerfil', dataUrl); // SALVANDO REALMENTE NO NAVEGADOR
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+        const vitrine = document.getElementById('vitrine');
+        
+        // Renderiza os produtos sem precisar de backend complexo
+        produtos.forEach(p => {
+            vitrine.innerHTML += `
+                <div class="border p-4 rounded-lg">
+                    <h2 class="text-xl font-semibold">${p.nome}</h2>
+                    <p class="text-gray-400">${p.desc}</p>
+                    <a href="https://wa.me/55062993901617?text=Quero comprar ${p.nome}" 
+                       class="mt-4 block bg-green-600 text-center py-2 rounded">Comprar via WhatsApp</a>
+                </div>
+            `;
+        });
     </script>
 </body>
 </html>
