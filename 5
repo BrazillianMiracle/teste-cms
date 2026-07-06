@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Rede Social - Estilo Orkut</title>
+    <style>
+        /* CSS Estilo Orkut Modernizado */
+        :root {
+            --orkut-blue: #3b5998;
+            --orkut-orange: #f47d20;
+            --bg-gray: #e9e9e9;
+        }
+
+        body { font-family: 'Verdana', sans-serif; background-color: var(--bg-gray); margin: 0; padding: 0; }
+        
+        /* Layout Principal */
+        .header { background: var(--orkut-blue); color: white; padding: 10px; display: flex; justify-content: space-between; }
+        .container { max-width: 1000px; margin: 20px auto; display: grid; grid-template-columns: 250px 1fr; gap: 20px; }
+
+        /* Sidebar Perfil */
+        .sidebar { background: white; padding: 15px; border: 1px solid #ccc; text-align: center; }
+        .profile-pic { width: 150px; height: 150px; background-color: #ddd; margin-bottom: 10px; border: 2px solid #333; display: block; margin-left: auto; margin-right: auto; }
+        .edit-btn { background: var(--orkut-orange); color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 10px; }
+
+        /* Conteúdo Principal */
+        .content { background: white; padding: 20px; border: 1px solid #ccc; }
+        .box { border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; }
+        
+        /* Formulários */
+        .hidden { display: none; }
+        .upload-form { padding: 15px; border: 1px dashed var(--orkut-blue); margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <header class="header">
+        <div><strong>MinhaRede</strong> - CMS v1.0</div>
+        <nav>Olá, Usuário | Sair</nav>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar Esquerda -->
+        <aside class="sidebar">
+            <img src="perfil.jpg" alt="Foto de Perfil" class="profile-pic" id="fotoPerfil">
+            <h3>João Silva</h3>
+            <p>São Paulo, Brasil</p>
+            <button class="edit-btn" onclick="toggleEdit()">Editar Foto</button>
+
+            <!-- Área de Edição -->
+            <div id="editArea" class="hidden upload-form">
+                <form id="formFoto">
+                    <label>Escolher nova foto:</label>
+                    <input type="file" id="fileInput" accept="image/*">
+                    <button type="submit">Salvar</button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Conteúdo Direita -->
+        <main class="content">
+            <section class="box">
+                <h2>Recados</h2>
+                <p>Nenhum recado novo hoje.</p>
+            </section>
+            
+            <section class="box">
+                <h2>Comunidades</h2>
+                <ul>
+                    <li>Programadores Java</li>
+                    <li>Fãs de Tecnologia</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Função para mostrar/esconder o editor de foto
+        function toggleEdit() {
+            const editArea = document.getElementById('editArea');
+            editArea.classList.toggle('hidden');
+        }
+
+        // Lógica de upload (Simulação)
+        document.getElementById('formFoto').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('fotoPerfil').src = e.target.result;
+                    alert('Foto alterada com sucesso!');
+                    toggleEdit();
+                }
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        });
+    </script>
+</body>
+</html>
