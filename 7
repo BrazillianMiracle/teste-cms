@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen p-4 md:p-10">
+    <div class="max-w-4xl mx-auto space-y-8">
+        <!-- Header -->
+        <header class="flex justify-between items-center border-b border-zinc-800 pb-6">
+            <h1 class="text-2xl font-black">TECH_STORE_OS</h1>
+            <div id="user-status" class="text-xs text-zinc-500 uppercase tracking-widest">Aguardando login...</div>
+        </header>
+
+        <!-- Seção de Perfil (Persistência) -->
+        <section class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 flex items-center gap-6">
+            <div id="avatar" class="w-20 h-20 bg-zinc-800 rounded-full flex items-center justify-center text-4xl cursor-pointer hover:bg-zinc-700">👤</div>
+            <div>
+                <h2 class="text-xl font-bold">Configuração de Usuário</h2>
+                <input type="file" id="fotoInput" class="hidden" onchange="uploadFoto(this)">
+                <button onclick="document.getElementById('fotoInput').click()" class="text-sm text-blue-400">Alterar Foto de Perfil</button>
+            </div>
+        </section>
+
+        <!-- Vitrine "Gigante" -->
+        <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
+
+    <script>
+        const produtos = [
+            {n: "RTX 4090", p: "R$ 12.000", cat: "GPU"},
+            {n: "Intel i9 14th", p: "R$ 4.500", cat: "CPU"},
+            {n: "64GB DDR5", p: "R$ 2.200", cat: "RAM"},
+            {n: "4TB NVMe", p: "R$ 1.800", cat: "SSD"},
+            {n: "Fonte 1200W", p: "R$ 1.500", cat: "PSU"},
+            {n: "Monitor 4K", p: "R$ 3.500", cat: "Monitor"}
+        ];
+
+        // Carrega dados persistentes ao iniciar
+        window.onload = () => {
+            const savedAvatar = localStorage.getItem('userAvatar');
+            if(savedAvatar) document.getElementById('avatar').innerHTML = `<img src="${savedAvatar}" class="w-20 h-20 rounded-full">`;
+            document.getElementById('user-status').innerText = "Status: Online | Session: Active";
+        };
+
+        // Função de upload com persistência
+        function uploadFoto(input) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                localStorage.setItem('userAvatar', e.target.result);
+                location.reload();
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        // Renderização da Vitrine
+        document.getElementById('grid').innerHTML = produtos.map(i => `
+            <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-800 hover:border-blue-500 transition-all">
+                <div class="text-xs text-blue-500 font-bold mb-2">${i.cat}</div>
+                <h3 class="text-xl font-bold mb-1">${i.n}</h3>
+                <p class="text-lg text-zinc-400 mb-6">${i.p}</p>
+                <a href="https://wa.me/55062993901617?text=Quero comprar ${i.n}" 
+                   class="block w-full bg-white text-black text-center py-3 rounded-xl font-bold hover:bg-zinc-200">FINALIZAR COMPRA</a>
+            </div>
+        `).join('');
+    </script>
+</body>
+</html>
